@@ -4,6 +4,12 @@
 <title>Tweet manager</title>
 <script src="http://maps.googleapis.com/maps/api/js"></script>
 <script>
+function setMarker(x, y, map) {
+    var pos = new google.maps.LatLng(x,y);
+    var marker=new google.maps.Marker({position:pos});
+    marker.setMap(map);
+}
+
 function initialize() {
   var mapProp = {
     center:new google.maps.LatLng(43.3458357,-8.4108504),
@@ -11,7 +17,14 @@ function initialize() {
     mapTypeId:google.maps.MapTypeId.ROADMAP
   };
   var map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
+  
+  
+  // let django put the markers
+  {% for m in markers %}
+    setMarker({{ m.x }}, {{m.y}}, map);
+  {% endfor %}
 }
+
 google.maps.event.addDomListener(window, 'load', initialize);
 </script>
 
@@ -72,7 +85,7 @@ h1 {
     </div>
     <div class="nofloat"></div>
     <div class="copy">
-        Autores: <a href="mailto:">Santiago Garcia Lesta</a> y <a href="mailto:o.blanco@idc.es">Oscar Blanco Novoa</a><br />
+        Autores: <a href="mailto:">Santiago Garcia Lesta</a> y <a href="mailto:o.blanco@udc.es">Oscar Blanco Novoa</a><br />
         Programacion integrativa, 2014-2015<br />
         <a href="http://www.fic.udc.es">Facultad de Informática de La Coruña.</a>
     </div>
