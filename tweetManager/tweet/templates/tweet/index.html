@@ -2,7 +2,18 @@
 <html>
 <head>
 <title>Tweet manager</title>
-
+<script src="http://maps.googleapis.com/maps/api/js"></script>
+<script>
+function initialize() {
+  var mapProp = {
+    center:new google.maps.LatLng(43.3458357,-8.4108504),
+    zoom:11,
+    mapTypeId:google.maps.MapTypeId.ROADMAP
+  };
+  var map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+</script>
 
 <style>
 body {
@@ -57,6 +68,7 @@ h1 {
     <div class="tweet-list">
     </div>
     <div class="right-column">
+        <div id="googleMap" style="width:346px;height:346px;"></div>
     </div>
     <div class="nofloat"></div>
     <div class="copy">
