@@ -84,6 +84,10 @@ h1 {
 	margin: 30px;
 }
 
+li.tweet {
+	margin:20px 0;
+}
+
 </style>
 <body>
 <div class="wrapper-main">
@@ -96,8 +100,13 @@ h1 {
     <div class="tweet-list">
     	<span>{% if error %} No se ha encontrado ningún resultado {% endif %}
 		<ul>
-		    <li class="tweet">hola</li>
-		    <li class="tweet">hola2</li>
+			{% for tweet in tweets %}
+		    	<li class="tweet">
+		    		<div class="user">{{tweet.screen_name}}</div><div class="subtitle">{{tweet.name}}</div>
+		    		<div class="body">{% autoescape off %}{{tweet.text}}{% endautoescape %}</div>
+		    		<span> retweets: {{tweet.retweet_count}}</span> &nbsp; <span>favoritos: {{tweet.favorite_count}}</span>
+		    	</li>
+		    {% endfor %}
 		</ul>
     </div>
     <div class="right-column">
