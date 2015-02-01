@@ -10,7 +10,7 @@ ACCESS_KEY = "3008895899-mdHYwFdRs1bEjrkqVwpy3Cq3X5pocaI6XcVx8ar"
 ACCESS_SECRET = "z1TvjeKuiHfp8VI6GLbg7itRqyYEZwH6uyh9Lt9P5kBX1"
 
 def processResponse(data):
-    context = {'markers':[]}
+    context = {'markers':[],'hashtags':{},'users':{}}
     hashtags = {}
     #print data[0]
     for tweet in data:
@@ -26,9 +26,15 @@ def processResponse(data):
         for tag in tweet['entities']['hashtags']:
             text = tag['text']
             hashtags[text] = hashtags.get(text, 0) + 1
+            
+        # set users info
+        name = tweet['user']['name']
+        context['users'][name] = context['users'].get(name, 0) + 1
+        
+   
 
     context['hashtags'] = sorted(hashtags.items(), key = lambda x: x[1], reverse=True)
-    
+    context['users'] = sorted(context['users'].items(), key = lambda x: x[1], reverse=True)
     
     #context={'markers':[{'x':43.34583, 'y':-8.4108}]}
     return context

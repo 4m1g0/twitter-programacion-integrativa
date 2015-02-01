@@ -90,10 +90,16 @@ h1 {
     </div>
     <div class="right-column">
         <div id="googleMap" style="width:346px;height:346px;"></div>
-        <h2>Hashtags más usados</h2>
+        <h3>Hashtags más usados</h2>
         <ul>
         	{% for tag, ocurrences in hashtags %}
 				<li><a href="https://twitter.com/hashtag/{{tag}}">#{{tag}}</a>  <span>{{ocurrences}}</span></li>
+			{% endfor %}
+        </ul>
+        <h3>Usuarios</h3>
+        <ul>
+        	{% for user, ocurrences in users %}
+				<li><a href="https://twitter.com/{{user}}">{{user}}</a>  <span>{{ocurrences}}</span></li>
 			{% endfor %}
         </ul>
     </div>
