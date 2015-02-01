@@ -64,7 +64,6 @@ h1 {
 }
 
 .tweet-list {
-    padding:20px;
     float:left;
     width:510px;
 }
@@ -85,7 +84,30 @@ h1 {
 }
 
 li.tweet {
-	margin:20px 0;
+	margin:10px 0;
+	padding:6px;
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 10px;
+}
+
+.user {
+	font-weight:bold;
+	font-size:1.5em;
+}
+
+.subtitle {
+	font-size:0.5em;
+	font-weight:normal;
+	font-style:italic;
+}
+
+.tweet .body {
+	margin:0.5em 0;
+}
+
+.tweet img {
+	margin-right:5px;
 }
 
 </style>
@@ -93,7 +115,7 @@ li.tweet {
 <div class="wrapper-main">
     <div class="header">
         <h1 style="float:left"><a href="{% url 'index' %}">Twitter manager</a></h1>
-        <div class="search"><form method="POST" action="{% url 'searchWord' %}">{% csrf_token %}Buscar: <input type="text" name="search"></form>
+        <div class="search"><form method="POST" action="{% url 'searchWord' %}">{% csrf_token %}Buscar: <input type="text" name="search"></form></div>
         
     </div>
     <div class="nofloat"></div>
@@ -102,7 +124,8 @@ li.tweet {
 		<ul>
 			{% for tweet in tweets %}
 		    	<li class="tweet">
-		    		<div class="user">{{tweet.screen_name}}</div><div class="subtitle">{{tweet.name}}</div>
+		    		<div class="user"><strong><a href="{{tweet.screen_name}}">{{tweet.name}}</a></strong> <span class="subtitle">@{{tweet.screen_name}}</span></div>
+		    		<img align="left" src="{{ tweet.profile_image }}">
 		    		<div class="body">{% autoescape off %}{{tweet.text}}{% endautoescape %}</div>
 		    		<span> retweets: {{tweet.retweet_count}}</span> &nbsp; <span>favoritos: {{tweet.favorite_count}}</span>
 		    	</li>

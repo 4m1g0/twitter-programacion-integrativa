@@ -13,6 +13,7 @@ ACCESS_SECRET = "hTQd68Y5fRnrOwLBiy6IEbEnI6IuMSTaw3LrmCzs1vkHT"
 def processResponse(data):
     context = {'markers':[],'hashtags':{},'users':{},'tweets':[]}
     hashtags = {}
+    pattern = None
     if 'keyword' in data:
         pattern = re.compile(re.escape(data['keyword']), re.IGNORECASE)
         
@@ -77,6 +78,6 @@ def searchUser(request, user):
     url = "https://api.twitter.com/1.1/statuses/user_timeline.json?" + urllib.urlencode(params)
     response, data = client.request(url)
     data = {'statuses': json.loads(data)}
-    return render(request, 'tweet/index.html', processResponse(json.loads(data)))
+    return render(request, 'tweet/index.html', processResponse(data))
     
 
