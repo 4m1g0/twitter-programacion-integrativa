@@ -40,6 +40,10 @@ h1 {
     padding:0.61em;
 }
 
+.header h1 a {
+	color:#000;
+}
+
 .wrapper-main {
     margin:0px auto;
     background-color:#FFF;
@@ -63,7 +67,6 @@ h1 {
     padding:20px;
     float:left;
     width:510px;
-    border-right:1px solid #999;
 }
 
 .right-column {
@@ -76,13 +79,22 @@ h1 {
 	list-style:none;
 }
 
+.search {
+	float: right;
+	margin: 30px;
+}
+
 </style>
 <body>
 <div class="wrapper-main">
     <div class="header">
-        <h1>Twitter manager</h1>
+        <h1 style="float:left"><a href="{% url 'index' %}">Twitter manager</a></h1>
+        <div class="search"><form method="POST" action="{% url 'searchWord' %}">{% csrf_token %}Buscar: <input type="text" name="search"></form>
+        
     </div>
+    <div class="nofloat"></div>
     <div class="tweet-list">
+    	<span>{% if error %} No se ha encontrado ningún resultado {% endif %}
 		<ul>
 		    <li class="tweet">hola</li>
 		    <li class="tweet">hola2</li>
@@ -98,8 +110,8 @@ h1 {
         </ul>
         <h3>Usuarios</h3>
         <ul>
-        	{% for user, ocurrences in users %}
-				<li><a href="https://twitter.com/{{user}}">{{user}}</a>  <span>{{ocurrences}}</span></li>
+        	{% for user, id in users %}
+				<li><a href="{% url 'searchUser' id %}">{{user}}</a></li>
 			{% endfor %}
         </ul>
     </div>

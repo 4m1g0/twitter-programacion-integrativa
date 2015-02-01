@@ -4,20 +4,17 @@ import oauth2 as oauth
 import json
 import urllib
 
-CONSUMER_KEY = "ViIjagjU58lD7dGmlbS16iSaR"
-CONSUMER_SECRET = "yTKbfcCrCYjm8WmnUavNMota8JSnumCcuPWuiH49lEt8mjMTrD"
-ACCESS_KEY = "3008895899-mdHYwFdRs1bEjrkqVwpy3Cq3X5pocaI6XcVx8ar"
-ACCESS_SECRET = "z1TvjeKuiHfp8VI6GLbg7itRqyYEZwH6uyh9Lt9P5kBX1"
+CONSUMER_KEY = "b6VE4Huq6ypz76CUdNsGulqXj"
+CONSUMER_SECRET = "a7aJg9nyf1aEzg5Pck30fSiuDNU0ED2hzKLFSjne27eBVKXhdO"
+ACCESS_KEY = "3008895899-nlv4Ni2JqEO7zieRxm7rtiw3PMZIIQVsmsXisjd"
+ACCESS_SECRET = "hTQd68Y5fRnrOwLBiy6IEbEnI6IuMSTaw3LrmCzs1vkHT"
 
 def processResponse(data):
     context = {'markers':[],'hashtags':{},'users':{}}
     hashtags = {}
-    #print data[0]
     for tweet in data:
         # set geo position
         pos = tweet['coordinates']
-        #print pos
-        #print tweet['text']
         if pos != None and pos['type'] == 'Point':
             pos = pos['coordinates']
             context['markers'].append({'x':pos[1], 'y':pos[0]})
@@ -29,12 +26,12 @@ def processResponse(data):
             
         # set users info
         name = tweet['user']['name']
-        context['users'][name] = context['users'].get(name, 0) + 1
+        context['users'][name] = tweet['user']['id']
         
-   
+    
 
     context['hashtags'] = sorted(hashtags.items(), key = lambda x: x[1], reverse=True)
-    context['users'] = sorted(context['users'].items(), key = lambda x: x[1], reverse=True)
+    context['users'] = context['users'].items()
     
     #context={'markers':[{'x':43.34583, 'y':-8.4108}]}
     return context
@@ -49,9 +46,20 @@ def index(request):
     return render(request, 'tweet/index.html', processResponse(json.loads(data)))
     
 def searchWord(request):
-    return 
-    
-def searchUser(request):
-    return
+    if request.POST.has_key('search'):
+        search=request.POST['search']
+        params = {'q':search}
+        url = "https://api.twitter.com/1.1/search/tweets.json?" + urllib.urlencode(params)
+        response, data = client.request(url)
+        return render(request, 'tweet/index.html', processResponse(json.loads(data)['statuses']))
+    else:
+        return render(request, 'tweet/index.html', {'error': True})
+
+def searchUser(request, user):
+    params = {'user_id':user}
+    url = "https://api.twitter.com/1.1/statuses/user_timeline.json?" + urllib.urlencode(params)
+    response, data = client.request(url)
+    print data
+    return render(request, 'tweet/index.html', processResponse(json.loads(data)))
     
 
