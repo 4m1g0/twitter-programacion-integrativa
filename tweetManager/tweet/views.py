@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
+from django.core.urlresolvers import reverse
 import oauth2 as oauth
 import cgi
 import json
@@ -50,6 +51,7 @@ def processResponse(data):
             post['text'] = tweet['text']
         post['screen_name'] = tweet['user']['screen_name']
         post['name'] = tweet['user']['name']
+        post['user_id'] = tweet['user']['id']
         post['profile_image'] = tweet['user']['profile_image_url_https']
         post['retweet_count'] = tweet['retweet_count']
         post['favorite_count'] = tweet['favorite_count']
@@ -64,13 +66,13 @@ def processResponse(data):
 #access_token = oauth.Token(key=ACCESS_KEY, secret=ACCESS_SECRET)
 #client = oauth.Client(consumer, access_token)
 consumer = oauth.Consumer(CONSUMER_KEY, CONSUMER_SECRET)
-client = oauth.Client(consumer)
 
-request_token_url = 'https://twitter.com/oauth/request_token?oauth_callback=http://54.152.186.74:8000/accounts/login/authenticated/'
+request_token_url = 'https://twitter.com/oauth/request_token?oauth_callback=http://54.152.186.74:8080/accounts/login/authenticated/'
 access_token_url = 'https://twitter.com/oauth/access_token'
 authenticate_url = 'https://twitter.com/oauth/authenticate'
 
 def twitter_login(request):
+    client = oauth.Client(consumer)
     # Step 1. Get a request token from Twitter.
     #body = urllib.urlencode(dict(oauth_callback='http://localhost:8000/accounts/login/authenticated/'))
     resp, content = client.request(request_token_url, "POST")
@@ -143,10 +145,13 @@ def twitter_authenticated(request):
         password=access_token['oauth_token_secret'])
     login(request, user)
 
-    return HttpResponseRedirect(reverse('views.index'))
+    return HttpResponseRedirect(reverse('index'))
     
 @login_required
 def index(request):
+    profile = Profile.objects.get(user=request.user)
+    access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
+    client = oauth.Client(consumer, access_token)
     url = "https://api.twitter.com/1.1/statuses/home_timeline.json"
     response, data = client.request(url)
     data = {'statuses': json.loads(data)}
@@ -155,6 +160,9 @@ def index(request):
 @login_required
 def searchWord(request):
     if request.POST.has_key('search'):
+        profile = Profile.objects.get(user=request.user)
+        access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
+        client = oauth.Client(consumer, access_token)
         search=request.POST['search']
         params = {'q':search}
         url = "https://api.twitter.com/1.1/search/tweets.json?" + urllib.urlencode(params)
@@ -167,6 +175,9 @@ def searchWord(request):
 
 @login_required
 def searchUser(request, user):
+    profile = Profile.objects.get(user=request.user)
+    access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
+    client = oauth.Client(consumer, access_token)
     params = {'user_id':user}
     url = "https://api.twitter.com/1.1/statuses/user_timeline.json?" + urllib.urlencode(params)
     response, data = client.request(url)

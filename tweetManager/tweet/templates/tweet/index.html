@@ -124,7 +124,7 @@ li.tweet {
 		<ul>
 			{% for tweet in tweets %}
 		    	<li class="tweet">
-		    		<div class="user"><strong><a href="{{tweet.screen_name}}">{{tweet.name}}</a></strong> <span class="subtitle">@{{tweet.screen_name}}</span></div>
+		    		<div class="user"><strong><a href="{% url 'searchUser' tweet.user_id  %}">{{tweet.name}}</a></strong> <span class="subtitle">@{{tweet.screen_name}}</span></div>
 		    		<img align="left" src="{{ tweet.profile_image }}">
 		    		<div class="body">{% autoescape off %}{{tweet.text}}{% endautoescape %}</div>
 		    		<span> retweets: {{tweet.retweet_count}}</span> &nbsp; <span>favoritos: {{tweet.favorite_count}}</span>
