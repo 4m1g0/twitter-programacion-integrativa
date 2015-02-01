@@ -11,7 +11,8 @@ ACCESS_SECRET = "z1TvjeKuiHfp8VI6GLbg7itRqyYEZwH6uyh9Lt9P5kBX1"
 
 def processResponse(data):
     context = {'markers':[]}
-    print data[0]
+    hashtags = {}
+    #print data[0]
     for tweet in data:
         # set geo position
         pos = tweet['coordinates']
@@ -22,7 +23,12 @@ def processResponse(data):
             context['markers'].append({'x':pos[1], 'y':pos[0]})
         
         # set hashtag info
-        #TODO
+        for tag in tweet['entities']['hashtags']:
+            text = tag['text']
+            hashtags[text] = hashtags.get(text, 0) + 1
+
+    context['hashtags'] = sorted(hashtags.items(), key = lambda x: x[1], reverse=True)
+    
     
     #context={'markers':[{'x':43.34583, 'y':-8.4108}]}
     return context

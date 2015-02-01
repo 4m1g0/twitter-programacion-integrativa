@@ -62,15 +62,18 @@ h1 {
 .tweet-list {
     padding:20px;
     float:left;
-    /*FIXME: REMOVE*/background-color:#f00;
     width:510px;
     border-right:1px solid #999;
 }
 
 .right-column {
-    /*FIXME: REMOVE*/background-color:#00f;
     padding:0px;
     margin-left:550px;
+    padding-bottom:40px;
+}
+
+.tweet-list ul {
+	list-style:none;
 }
 
 </style>
@@ -87,6 +90,12 @@ h1 {
     </div>
     <div class="right-column">
         <div id="googleMap" style="width:346px;height:346px;"></div>
+        <h2>Hashtags más usados</h2>
+        <ul>
+        	{% for tag, ocurrences in hashtags %}
+				<li><a href="https://twitter.com/hashtag/{{tag}}">#{{tag}}</a>  <span>{{ocurrences}}</span></li>
+			{% endfor %}
+        </ul>
     </div>
     <div class="nofloat"></div>
 </div>
