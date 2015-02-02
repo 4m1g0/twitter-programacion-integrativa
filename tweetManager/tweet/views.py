@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
+from urllib import urlopen
 import oauth2 as oauth
 import cgi
 import json
@@ -56,6 +57,11 @@ def processResponse(data):
         post['profile_image'] = tweet['user']['profile_image_url_https']
         post['retweet_count'] = tweet['retweet_count']
         post['favorite_count'] = tweet['favorite_count']
+        if tweet.has_key('extended_entities'):
+            post['images'] = []
+            for media in tweet['extended_entities']['media']:
+                if media['type'] == 'photo':
+                    post['images'].append(media['media_url'])
         context['tweets'].append(post)
 
     context['hashtags'] = sorted(hashtags.items(), key = lambda x: x[1], reverse=True)
@@ -191,19 +197,31 @@ def blocAction(request):
     #profile = Profile.objects.get(user=request.user)
     #access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
     #client = oauth.Client(consumer, access_token)
-    users = request.POST.getlist('users')
-    if request.POST.has_key('follow'):
-        url = 'https://api.twitter.com/1.1/friendships/create.json'
-        for user in users:
-            params = {'user_id':user}
-            response, data = client.request(url, method="POST", body=urllib.urlencode(params))
+    if not request.POST.has_key('download'):
+        users = request.POST.getlist('users')
+        if request.POST.has_key('follow'): 
+            url = 'https://api.twitter.com/1.1/friendships/create.json'
+            for user in users:
+                params = {'user_id':user}
+                response, data = client.request(url, method="POST", body=urllib.urlencode(params))
+            
+        else:
+            url = "https://api.twitter.com/1.1/direct_messages/new.json"
+            for user in users:
+                params = {'user_id':user, 'text':request.POST['mp']}
+                response, data = client.request(url, method="POST", body=urllib.urlencode(params))
+    
+    else: # download images
+        images = request.POST.getlist('images')
+        i = 0
+        for image in images:
+            file = open('downloads/' + str(i) +".jpg", "w")
+            file.write(urlopen(image + ':large').read())
+            file.close()
+            i += 1
+            
+            # perform C interaction
         
-    else:
-        url = "https://api.twitter.com/1.1/direct_messages/new.json"
-        for user in users:
-            params = {'user_id':user, 'text':request.POST['mp']}
-            response, data = client.request(url, method="POST", body=urllib.urlencode(params))
-
     return render(request, 'tweet/blocAction.html')
 
 

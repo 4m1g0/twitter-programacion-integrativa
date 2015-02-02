@@ -128,6 +128,11 @@ li.tweet {
 		    		<img align="left" src="{{ tweet.profile_image }}">
 		    		<div class="body">{% autoescape off %}{{tweet.text}}{% endautoescape %}</div>
 		    		<span> retweets: {{tweet.retweet_count}}</span> &nbsp; <span>favoritos: {{tweet.favorite_count}}</span>
+		    		<div class="images">
+		    			{% for image_url in tweet.images %}
+		    				<a href="{{image_url}}"><img src="{{image_url}}:thumb" /></a>
+		    			{% endfor %}
+		    		</div>
 		    	</li>
 		    {% endfor %}
 		</ul>
@@ -157,6 +162,16 @@ li.tweet {
         	<br /><br />
         	Seguir a todos:<br />
         	<input type="submit" name="follow" value="seguir">
+        </form><br /><br />
+        Descargar todas las imágenes:
+        <form method="POST" action="{% url 'blocAction' %}">
+        	{% csrf_token %}
+        	{% for tweet in tweets %}
+        		{% for image_url in tweet.images %}
+        			<input type="hidden" name="images" value="{{image_url}}">
+        		{% endfor %}
+        	{% endfor %}
+        	<input type="submit" name="download" value="Descargar">
         </form>
     </div>
     <div class="nofloat"></div>
