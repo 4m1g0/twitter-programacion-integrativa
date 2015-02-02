@@ -146,6 +146,18 @@ li.tweet {
 				<li><a href="{% url 'searchUser' id %}">{{user}}</a></li>
 			{% endfor %}
         </ul>
+        Enviar MP a todos:
+        <form method="POST" action="{% url 'blocAction' %}">
+        	{% csrf_token %}
+        	{% for user, id in users %}
+        		<input type="hidden" name="users" value="{{id}}">
+        	{% endfor %}
+        	<textarea name="mp" rows="3" cols="40"> </textarea>
+        	<input type="submit" name="send" value="Enviar">
+        	<br /><br />
+        	Seguir a todos:<br />
+        	<input type="submit" name="follow" value="seguir">
+        </form>
     </div>
     <div class="nofloat"></div>
 </div>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tweet manager</title>
+<style>
+body {
+    background-color:#888;
+    padding:0px;
+    margin:0px;
+}
+
+h1 {
+    margin:0px;
+    padding:0.61em;
+}
+
+.header h1 a {
+	color:#000;
+}
+
+.wrapper-main {
+    margin:0px auto;
+    background-color:#FFF;
+    width:900px;
+}
+
+.copy {
+    text-align:center;
+    margin: 20px auto;
+    padding: 20px;
+    width:400px;
+    border-style:solid;
+    border-width:1px;
+}
+
+.nofloat{
+	clear: both;
+}
+
+.search {
+	float: right;
+	margin: 30px;
+}
+</style>
+<body>
+<div class="wrapper-main">
+    <div class="header">
+        <h1 style="float:left"><a href="{% url 'index' %}">Twitter manager</a></h1>
+        <div class="search"><form method="POST" action="{% url 'searchWord' %}">{% csrf_token %}Buscar: <input type="text" name="search"></form></div>
+        
+    </div>
+    <div class="nofloat"></div>
+    <p align="center" style="padding:20px;">La petición se ha llevado a cabo correctamente.</p>
+</div>
+<div class="copy">
+    Autores: <a href="mailto:">Santiago Garcia Lesta</a> y <a href="mailto:o.blanco@udc.es">Oscar Blanco Novoa</a><br />
+    Programacion integrativa, 2014-2015<br />
+    <a href="http://www.fic.udc.es">Facultad de Informática de La Coruña.</a>
+</div>
+</body>
+</html>
+

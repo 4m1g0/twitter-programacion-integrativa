@@ -17,8 +17,9 @@ from tweet.models import Profile
 
 CONSUMER_KEY = "b6VE4Huq6ypz76CUdNsGulqXj"
 CONSUMER_SECRET = "a7aJg9nyf1aEzg5Pck30fSiuDNU0ED2hzKLFSjne27eBVKXhdO"
-#ACCESS_KEY = "3008895899-nlv4Ni2JqEO7zieRxm7rtiw3PMZIIQVsmsXisjd"
-#ACCESS_SECRET = "hTQd68Y5fRnrOwLBiy6IEbEnI6IuMSTaw3LrmCzs1vkHT"
+# FIXME: Comment this lines
+ACCESS_KEY = "3008895899-nlv4Ni2JqEO7zieRxm7rtiw3PMZIIQVsmsXisjd"
+ACCESS_SECRET = "hTQd68Y5fRnrOwLBiy6IEbEnI6IuMSTaw3LrmCzs1vkHT"
 
 def processResponse(data):
     context = {'markers':[],'hashtags':{},'users':{},'tweets':[]}
@@ -62,11 +63,12 @@ def processResponse(data):
     
     return context
 
-#consumer = oauth.Consumer(key=CONSUMER_KEY, secret=CONSUMER_SECRET)
-#access_token = oauth.Token(key=ACCESS_KEY, secret=ACCESS_SECRET)
-#client = oauth.Client(consumer, access_token)
-consumer = oauth.Consumer(CONSUMER_KEY, CONSUMER_SECRET)
-
+# FIXME: comment this lines and uncoment las one
+consumer = oauth.Consumer(key=CONSUMER_KEY, secret=CONSUMER_SECRET)
+access_token = oauth.Token(key=ACCESS_KEY, secret=ACCESS_SECRET)
+client = oauth.Client(consumer, access_token)
+#consumer = oauth.Consumer(CONSUMER_KEY, CONSUMER_SECRET)
+                                                                                # FIXME: hardcoded url below
 request_token_url = 'https://twitter.com/oauth/request_token?oauth_callback=http://54.152.186.74:8080/accounts/login/authenticated/'
 access_token_url = 'https://twitter.com/oauth/access_token'
 authenticate_url = 'https://twitter.com/oauth/authenticate'
@@ -76,7 +78,7 @@ def twitter_login(request):
     # Step 1. Get a request token from Twitter.
     #body = urllib.urlencode(dict(oauth_callback='http://localhost:8000/accounts/login/authenticated/'))
     resp, content = client.request(request_token_url, "POST")
-    print resp['status']
+    #print resp['status']
     if resp['status'] != '200':
         raise Exception("Invalid response from Twitter.")
 
@@ -147,22 +149,22 @@ def twitter_authenticated(request):
 
     return HttpResponseRedirect(reverse('index'))
     
-@login_required
+#@login_required
 def index(request):
-    profile = Profile.objects.get(user=request.user)
-    access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
-    client = oauth.Client(consumer, access_token)
+    #profile = Profile.objects.get(user=request.user)
+    #access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
+    #client = oauth.Client(consumer, access_token)
     url = "https://api.twitter.com/1.1/statuses/home_timeline.json"
     response, data = client.request(url)
     data = {'statuses': json.loads(data)}
     return render(request, 'tweet/index.html', processResponse(data))
     
-@login_required
+#@login_required
 def searchWord(request):
     if request.POST.has_key('search'):
-        profile = Profile.objects.get(user=request.user)
-        access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
-        client = oauth.Client(consumer, access_token)
+        #profile = Profile.objects.get(user=request.user)
+        #access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
+        #client = oauth.Client(consumer, access_token)
         search=request.POST['search']
         params = {'q':search}
         url = "https://api.twitter.com/1.1/search/tweets.json?" + urllib.urlencode(params)
@@ -173,15 +175,37 @@ def searchWord(request):
     else:
         return render(request, 'tweet/index.html', {'error': True})
 
-@login_required
+#@login_required
 def searchUser(request, user):
-    profile = Profile.objects.get(user=request.user)
-    access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
-    client = oauth.Client(consumer, access_token)
+    #profile = Profile.objects.get(user=request.user)
+    #access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
+    #client = oauth.Client(consumer, access_token)
     params = {'user_id':user}
     url = "https://api.twitter.com/1.1/statuses/user_timeline.json?" + urllib.urlencode(params)
     response, data = client.request(url)
     data = {'statuses': json.loads(data)}
     return render(request, 'tweet/index.html', processResponse(data))
+
+#@login_required  
+def blocAction(request):
+    #profile = Profile.objects.get(user=request.user)
+    #access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
+    #client = oauth.Client(consumer, access_token)
+    users = request.POST.getlist('users')
+    if request.POST.has_key('follow'):
+        url = 'https://api.twitter.com/1.1/friendships/create.json'
+        for user in users:
+            params = {'user_id':user}
+            response, data = client.request(url, method="POST", body=urllib.urlencode(params))
+        
+    else:
+        url = "https://api.twitter.com/1.1/direct_messages/new.json"
+        for user in users:
+            params = {'user_id':user, 'text':request.POST['mp']}
+            response, data = client.request(url, method="POST", body=urllib.urlencode(params))
+
+    return render(request, 'tweet/blocAction.html')
+
+
     
 
