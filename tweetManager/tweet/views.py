@@ -74,8 +74,7 @@ consumer = oauth.Consumer(key=CONSUMER_KEY, secret=CONSUMER_SECRET)
 access_token = oauth.Token(key=ACCESS_KEY, secret=ACCESS_SECRET)
 client = oauth.Client(consumer, access_token)
 #consumer = oauth.Consumer(CONSUMER_KEY, CONSUMER_SECRET)
-                                                                                # FIXME: hardcoded url below
-request_token_url = 'https://twitter.com/oauth/request_token?oauth_callback=http://54.152.186.74:8080/accounts/login/authenticated/'
+request_token_url = 'https://twitter.com/oauth/request_token?oauth_callback=' + reverse('twitter_authenticated') #http://54.152.186.74:8080/accounts/login/authenticated/'
 access_token_url = 'https://twitter.com/oauth/access_token'
 authenticate_url = 'https://twitter.com/oauth/authenticate'
 
