@@ -89,10 +89,10 @@ def setAlert(word, time):
     os.system('(crontab -l ; echo "* * * * * ~/twitter-programacion-integrativa/script.sh") | sort - | uniq - | crontab -')
 
 # FIXME: comment this lines and uncoment las one
-consumer = oauth.Consumer(key=CONSUMER_KEY, secret=CONSUMER_SECRET)
-access_token = oauth.Token(key=ACCESS_KEY, secret=ACCESS_SECRET)
-client = oauth.Client(consumer, access_token)
-#consumer = oauth.Consumer(CONSUMER_KEY, CONSUMER_SECRET)
+#consumer = oauth.Consumer(key=CONSUMER_KEY, secret=CONSUMER_SECRET)
+#access_token = oauth.Token(key=ACCESS_KEY, secret=ACCESS_SECRET)
+#client = oauth.Client(consumer, access_token)
+consumer = oauth.Consumer(CONSUMER_KEY, CONSUMER_SECRET)
 access_token_url = 'https://twitter.com/oauth/access_token'
 authenticate_url = 'https://twitter.com/oauth/authenticate'
 
@@ -204,9 +204,9 @@ def searchWord(request):
 
 #@login_required
 def searchUser(request, user):
-    #profile = Profile.objects.get(user=request.user)
-    #access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
-    #client = oauth.Client(consumer, access_token)
+    profile = Profile.objects.get(user=request.user)
+    access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
+    client = oauth.Client(consumer, access_token)
     params = {'user_id':user}
     url = "https://api.twitter.com/1.1/statuses/user_timeline.json?" + urllib.urlencode(params)
     response, data = client.request(url)
@@ -215,9 +215,9 @@ def searchUser(request, user):
 
 #@login_required  
 def blocAction(request):
-    #profile = Profile.objects.get(user=request.user)
-    #access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
-    #client = oauth.Client(consumer, access_token)
+    profile = Profile.objects.get(user=request.user)
+    access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
+    client = oauth.Client(consumer, access_token)
     if not request.POST.has_key('download'):
         users = request.POST.getlist('users')
         if request.POST.has_key('follow'): 
