@@ -172,7 +172,16 @@ li.tweet {
         		{% endfor %}
         	{% endfor %}
         	<input type="submit" name="download" value="Descargar">
+        </form><br />
+        {% if keyword %}
+        Asignar alerta para: "{{keyword}}"
+        <form method="POST" action="{% url 'index' %}">
+        	{% csrf_token %}
+        	<input type="hidden" name="keyword" value="{{keyword}}">
+        	<input type="hidden" name="date" value="{{tweets.0.date}}">
+        	<input type="submit" name="Asignar" value="Asignar alerta">
         </form>
+        {% endif %}
     </div>
     <div class="nofloat"></div>
 </div>

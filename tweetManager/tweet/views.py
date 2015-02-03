@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from django.core.urlresolvers import reverse
 from urllib import urlopen
 import oauth2 as oauth
@@ -11,6 +11,7 @@ import json
 import urllib
 import re
 import os
+from datetime import datetime
 
 import imageTools
 
@@ -19,6 +20,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
 from tweet.models import Profile
+from tweet.models import Alert
 
 CONSUMER_KEY = "b6VE4Huq6ypz76CUdNsGulqXj"
 CONSUMER_SECRET = "a7aJg9nyf1aEzg5Pck30fSiuDNU0ED2hzKLFSjne27eBVKXhdO"
@@ -53,6 +55,7 @@ def processResponse(data):
         post = {}
         if pattern:
             post['text'] = pattern.sub('<b>'+data['keyword']+'</b>', tweet['text'])
+            context['keyword'] = data['keyword']
         else:
             post['text'] = tweet['text']
         post['screen_name'] = tweet['user']['screen_name']
@@ -61,6 +64,7 @@ def processResponse(data):
         post['profile_image'] = tweet['user']['profile_image_url_https']
         post['retweet_count'] = tweet['retweet_count']
         post['favorite_count'] = tweet['favorite_count']
+        post['date'] = tweet['created_at']
         if tweet.has_key('extended_entities'):
             post['images'] = []
             for media in tweet['extended_entities']['media']:
@@ -72,6 +76,16 @@ def processResponse(data):
     context['users'] = context['users'].items()
     
     return context
+    
+def setAlert(word, time):
+    alert = Alert.objects.all()
+    if not alert:
+        alert = Alert()
+    else:
+        alert = alert[0]
+    alert.word = word
+    alert.last = time
+    alert.save()
 
 # FIXME: comment this lines and uncoment las one
 consumer = oauth.Consumer(key=CONSUMER_KEY, secret=CONSUMER_SECRET)
@@ -161,6 +175,8 @@ def twitter_authenticated(request):
     
 #@login_required
 def index(request):
+    if request.POST.has_key('keyword'):
+        setAlert(request.POST['keyword'], request.POST['date'])
     #profile = Profile.objects.get(user=request.user)
     #access_token = oauth.Token(key=profile.oauth_token, secret=profile.oauth_secret)
     #client = oauth.Client(consumer, access_token)
@@ -256,6 +272,23 @@ def blocAction(request):
         
     return render(request, 'tweet/blocAction.html')
 
-
+def newTweet(request):
+    access_token = oauth.Token(key=ACCESS_KEY, secret=ACCESS_SECRET)
+    client = oauth.Client(consumer, access_token)
+    alert = Alert.objects.all()
+    alert = alert[0]
+    params = {'q':alert.word, 'count':1}
+    url = "https://api.twitter.com/1.1/search/tweets.json?" + urllib.urlencode(params)
+    response, data = client.request(url)
+    data = json.loads(data)
+    date_str = data['statuses'][0]['created_at']
+    new = datetime.strptime(date_str, '%a %b %d %H:%M:%S +0000 %Y')
+    last = datetime.strptime(alert.last, '%a %b %d %H:%M:%S +0000 %Y')
+    if new > last:
+        return HttpResponse('') # 200 cuerpo vacio
+    else:
+        return HttpResponseNotFound('') # 404
+    
+    
     
 
