@@ -168,7 +168,7 @@ li.tweet {
         	{% csrf_token %}
         	{% for tweet in tweets %}
         		{% for image_url in tweet.images %}
-        			<input type="hidden" name="images" value="{{image_url}}">
+        			<input type="hidden" name="images" value="{{image_url}} {{tweet.screen_name}} {{tweet.text}}">
         		{% endfor %}
         	{% endfor %}
         	<input type="submit" name="download" value="Descargar">

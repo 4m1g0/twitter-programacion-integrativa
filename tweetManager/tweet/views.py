@@ -5,10 +5,14 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from urllib import urlopen
 import oauth2 as oauth
+import shutil
 import cgi
 import json
 import urllib
 import re
+import os
+
+import imageTools
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -74,11 +78,12 @@ consumer = oauth.Consumer(key=CONSUMER_KEY, secret=CONSUMER_SECRET)
 access_token = oauth.Token(key=ACCESS_KEY, secret=ACCESS_SECRET)
 client = oauth.Client(consumer, access_token)
 #consumer = oauth.Consumer(CONSUMER_KEY, CONSUMER_SECRET)
-request_token_url = 'https://twitter.com/oauth/request_token?oauth_callback=' + reverse('twitter_authenticated') #http://54.152.186.74:8080/accounts/login/authenticated/'
 access_token_url = 'https://twitter.com/oauth/access_token'
 authenticate_url = 'https://twitter.com/oauth/authenticate'
 
 def twitter_login(request):
+    request_token_url = 'https://twitter.com/oauth/request_token?oauth_callback=' + request.get_host() + 'accounts/login/authenticated/' 
+    #http://54.152.186.74:8080/accounts/login/authenticated/'
     client = oauth.Client(consumer)
     # Step 1. Get a request token from Twitter.
     #body = urllib.urlencode(dict(oauth_callback='http://localhost:8000/accounts/login/authenticated/'))
@@ -212,14 +217,42 @@ def blocAction(request):
     
     else: # download images
         images = request.POST.getlist('images')
-        i = 0
-        for image in images:
-            file = open('downloads/' + str(i) +".jpg", "w")
+        filenames = []
+        i = 0     
+        for image_str in images:
+            # parse image string
+            index = image_str.find(' ')
+            image = image_str[0:index]
+            index2 = image_str[index+1:].find(' ')
+            screen_name = image_str[index+1:index+1+index2]
+            text = image_str[index+index2+2:]
+            
+            match = re.search(r'[^/]*\.[^/]*$', image)
+            filename = match.group()
+            
+            file = open('downloads/' + filename, "w")
             file.write(urlopen(image + ':large').read())
             file.close()
+            borrado = False
+            for reference in filenames:
+                dif = imageTools.compare('downloads/'+str(reference),'downloads/'+str(filename))
+                if dif > 20: # they are very similar
+                    os.remove('downloads/'+filename)
+                    borrado = True
+                    break
+            if borrado: 
+                continue
+                
+            filenames.append(filename)
             i += 1
             
-            # perform C interaction
+            try:
+                shutil.move('downloads/'+filename, filename)
+                imageTools.setMeta(str(filename), str('x'+filename),str(screen_name.encode("ascii","ignore")),str(text.encode("ascii","ignore")))
+                shutil.move('x'+filename, 'downloads/'+filename)
+                os.remove(filename)
+            except:
+                print "error with file " + filename
         
     return render(request, 'tweet/blocAction.html')
 
