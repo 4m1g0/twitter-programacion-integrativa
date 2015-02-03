@@ -1,0 +1,5 @@
+c/*.o
+c/*_wrap.*
+*/_imageTools.so
+*/db.sqlite3
+*/imageTools.py
