@@ -86,6 +86,7 @@ def setAlert(word, time):
     alert.word = word
     alert.last = time
     alert.save()
+    os.system('(crontab -l ; echo "* * * * * ~/twitter-programacion-integrativa/script.sh") | sort - | uniq - | crontab -')
 
 # FIXME: comment this lines and uncoment las one
 consumer = oauth.Consumer(key=CONSUMER_KEY, secret=CONSUMER_SECRET)
